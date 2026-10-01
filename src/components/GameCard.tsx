@@ -22,6 +22,22 @@ export const GameCard: React.FC<GameCardProps> = React.memo(({
   const isCached = Boolean(cachedMeta && (!daysRemaining || daysRemaining > 0));
   const cardId = game.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+  const cleanThumbnail = React.useMemo(() => {
+    const raw = game.thumbnail || '';
+    if (!raw) return '';
+    if (raw.includes('ignimgs.com') || raw.includes('ign.com')) {
+      return raw
+        .replace(/([\?&])crop=[^&]+/gi, '$1')
+        .replace(/[\?&]width=\d+/gi, '')
+        .replace(/[\?&]height=\d+/gi, '')
+        .replace(/[\?&]dpr=\d+/gi, '')
+        .replace(/[\?&]+$/gi, '')
+        .replace(/\?&/gi, '?')
+        .replace(/&&/gi, '&');
+    }
+    return raw;
+  }, [game.thumbnail]);
+
   return (
     <div
       id={`game-card-${cardId}`}
@@ -30,9 +46,9 @@ export const GameCard: React.FC<GameCardProps> = React.memo(({
     >
       {/* 1:1 Thumbnail image - Stays 100% undimmed on hover */}
       <div className="absolute inset-0 w-full h-full bg-[#111111]">
-        {!imgFailed && game.thumbnail ? (
+        {!imgFailed && cleanThumbnail ? (
           <img
-            src={game.thumbnail}
+            src={cleanThumbnail}
             alt={game.name}
             referrerPolicy="no-referrer"
             onError={() => setImgFailed(true)}

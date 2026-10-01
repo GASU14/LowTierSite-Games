@@ -21,8 +21,8 @@ import {
 } from './utils/cacheManager';
 
 export default function App() {
-  // Games state loaded directly from local GameMetadata.json for offline/static capabilities
-  const [games] = useState<GameItem[]>(gameMetadata as GameItem[]);
+  // Games state loaded directly from local GameMetadata.json, and dynamically updated from fetch at runtime
+  const [games, setGames] = useState<GameItem[]>(gameMetadata as GameItem[]);
 
   // App state
   const [cachedGamesMap, setCachedGamesMap] = useState<Map<string, CachedGameMeta>>(new Map());
@@ -54,6 +54,35 @@ export default function App() {
   useEffect(() => {
     initServiceWorker();
     refreshCacheStatus();
+
+    // Dynamically fetch GameMetadata.json at runtime to support instant updates without Vite rebuilds!
+    const loadGameMetadata = async () => {
+      const paths = [
+        './src/data/GameMetadata.json',
+        'src/data/GameMetadata.json',
+        './GameMetadata.json',
+        'GameMetadata.json',
+        '../src/data/GameMetadata.json',
+        '../../src/data/GameMetadata.json',
+        '/src/data/GameMetadata.json'
+      ];
+      for (const path of paths) {
+        try {
+          const res = await fetch(path);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              setGames(data as GameItem[]);
+              console.log('Successfully loaded game metadata dynamically from', path);
+              break;
+            }
+          }
+        } catch (e) {
+          // try next path
+        }
+      }
+    };
+    loadGameMetadata();
   }, []);
 
   // Compute unique genres (supporting multi-genres per game)
