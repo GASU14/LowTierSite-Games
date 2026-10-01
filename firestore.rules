@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'jayden.gass10@gmail.com'
+      );
+    }
+
+    // Games catalog stored in Firestore
+    match /games/{gameId} {
+      allow read: if true;
+      allow write: if true; // Allows syncing all games to Firebase & admin additions
+    }
+
+    // Community Unified Feed (General, Announcements, Chat, Bug Reports, Suggestions)
+    match /community_posts/{postId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    // Testers legacy channels for backward compatibility
+    match /testers_announcements/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /testers_chat/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /testers_bug_reports/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /testers_suggestions/{document=**} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // User accounts & community profiles
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Administrators
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Banned members registry
+    match /banned_users/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

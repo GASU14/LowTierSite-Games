@@ -1,0 +1,169 @@
+{
+  "entities": {
+    "Game": {
+      "title": "Game",
+      "description": "Game configuration, repository, and assets hosted in the application",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The title of the game",
+          "maxLength": 100
+        },
+        "repo": {
+          "type": "string",
+          "description": "GitHub repository URL containing the web build of the game",
+          "maxLength": 255
+        },
+        "thumbnail": {
+          "type": "string",
+          "description": "Poster art or icon URL for the game",
+          "maxLength": 500
+        },
+        "badge": {
+          "type": "string",
+          "description": "Performance tier badge (e.g. Low, Medium, High, Ultra Low)",
+          "maxLength": 50
+        },
+        "genre": {
+          "type": "string",
+          "description": "Game genre category",
+          "maxLength": 50
+        },
+        "entryPoint": {
+          "type": "string",
+          "description": "Optional custom entry HTML file name",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Unix timestamp when the game was registered"
+        }
+      },
+      "required": ["name", "repo", "genre"]
+    },
+    "CommunityPost": {
+      "title": "CommunityPost",
+      "description": "Community messages, chats, and announcements",
+      "type": "object",
+      "properties": {
+        "tab": {
+          "type": "string",
+          "description": "Channel or category: general, announcements, chat, bug_reports, suggestions",
+          "maxLength": 30
+        },
+        "content": {
+          "type": "string",
+          "description": "Text message body content",
+          "maxLength": 3000
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Optional base64 optimized WebP or CDN image attachment",
+          "maxLength": 200000
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Display name of the author",
+          "maxLength": 50
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Auth UID or client identifier of the author",
+          "maxLength": 128
+        },
+        "authorBadge": {
+          "type": "string",
+          "description": "Role badge: ADMIN, MEMBER, or GUEST",
+          "maxLength": 20
+        },
+        "isAnnouncement": {
+          "type": "boolean",
+          "description": "Whether this post is pinned as an official announcement"
+        }
+      },
+      "required": ["tab", "authorName", "authorId"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Community user profile and authorization status",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID",
+          "maxLength": 128
+        },
+        "username": {
+          "type": "string",
+          "description": "Community handle/username",
+          "maxLength": 50
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "description": "Role: admin or member",
+          "maxLength": 20
+        },
+        "badge": {
+          "type": "string",
+          "description": "Badge displayed next to username",
+          "maxLength": 20
+        },
+        "isBanned": {
+          "type": "boolean",
+          "description": "Flag indicating if the user is barred from participating"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Creation timestamp in milliseconds"
+        }
+      },
+      "required": ["uid", "username"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Elevated administrator authorization record",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of administrator",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address associated with administrator",
+          "maxLength": 100
+        },
+        "grantedAt": {
+          "type": "number",
+          "description": "Timestamp when admin status was granted"
+        }
+      },
+      "required": ["uid"]
+    }
+  },
+  "firestore": {
+    "/games/{gameId}": {
+      "schema": { "$ref": "#/entities/Game" },
+      "description": "Collection of all web games playable in the application"
+    },
+    "/community_posts/{postId}": {
+      "schema": { "$ref": "#/entities/CommunityPost" },
+      "description": "Community messages, general chat, and announcements"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Registered community user profiles"
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Administrator registry granting access to delete chats, ban users, and add games"
+    }
+  }
+}

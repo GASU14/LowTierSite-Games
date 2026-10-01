@@ -1,0 +1,6 @@
+{
+  "name": "Games",
+  "description": "Fire ass site",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
